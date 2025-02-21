@@ -37,3 +37,4 @@ Your colleagues will need to pull the changes and run `npm run migrateLocal` to 
 - [Hooks](https://adminforth.dev/docs/tutorial/Customization/hooks/)
 - [Custom Pages](https://adminforth.dev/docs/tutorial/Customization/customPages/)
 # deploy-af
+# deploy-af
