@@ -1,4 +1,3 @@
-
 locals {
   app_name = "deploy-af"
   aws_region = "us-east-1"
@@ -204,9 +203,13 @@ resource "null_resource" "setup_registry" {
 
 
 resource "null_resource" "sync_files_and_run" {
-
   provisioner "local-exec" {
     command = <<-EOF
+      # Wait for SSH to become available
+      while ! nc -z ${aws_eip_association.eip_assoc.public_ip} 22; do
+        echo "Waiting for SSH to become available..."
+        sleep 5
+      done
 
       # map appserver.local to the instance (in GA we don't know the IP, so have to use this mapping)
       grep -q "appserver.local" /etc/hosts || echo "${aws_eip_association.eip_assoc.public_ip} appserver.local" | sudo tee -a /etc/hosts
