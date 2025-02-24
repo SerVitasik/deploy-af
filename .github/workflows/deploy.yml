@@ -62,10 +62,14 @@ jobs:
         env:
           VAULT_AWS_ACCESS_KEY_ID: ${{ secrets.VAULT_AWS_ACCESS_KEY_ID }}
           VAULT_AWS_SECRET_ACCESS_KEY: ${{ secrets.VAULT_AWS_SECRET_ACCESS_KEY }}
-        
-        - name: Prepare env
+
+      - name: Prepare env
         run: |
           echo "" > deploy/.env.live
+          echo "OPENAI_API_KEY=$VAULT_OPENAI_API_KEY" >> deploy/.env.live
+        env:
+          VAULT_OPENAI_API_KEY: ${{ secrets.VAULT_OPENAI_API_KEY }}
+
       - name: Terraform build
         run: |
           cd deploy
