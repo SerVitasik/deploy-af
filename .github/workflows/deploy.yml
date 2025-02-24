@@ -66,9 +66,6 @@ jobs:
         - name: Prepare env
         run: |
           echo "" > deploy/.env.live
-          echo "OPENAI_API_KEY=$VAULT_OPENAI_API_KEY" >> deploy/.env.live
-        env:
-          VAULT_OPENAI_API_KEY: ${{ secrets.VAULT_OPENAI_API_KEY }}
       - name: Terraform build
         run: |
           cd deploy
