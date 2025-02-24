@@ -135,6 +135,11 @@ resource "aws_instance" "app_instance" {
     systemctl start docker
     systemctl enable docker
     usermod -a -G docker ubuntu
+
+    # Ensure SSH directory exists with correct permissions
+    mkdir -p /home/ubuntu/.ssh
+    chmod 700 /home/ubuntu/.ssh
+    chown ubuntu:ubuntu /home/ubuntu/.ssh
   EOF
 
   tags = {
@@ -201,6 +206,23 @@ resource "null_resource" "setup_registry" {
   }
 }
 
+resource "null_resource" "setup_ssh" {
+  provisioner "remote-exec" {
+    inline = [
+      "echo 'Waiting for cloud-init to complete...'",
+      "cloud-init status --wait",
+    ]
+
+    connection {
+      type        = "ssh"
+      user        = "ubuntu"
+      private_key = file("./.keys/id_rsa")
+      host        = aws_eip_association.eip_assoc.public_ip
+    }
+  }
+
+  depends_on = [aws_instance.app_instance, aws_eip_association.eip_assoc]
+}
 
 resource "null_resource" "sync_files_and_run" {
   provisioner "local-exec" {
@@ -273,7 +295,7 @@ resource "null_resource" "sync_files_and_run" {
     always_run = timestamp()
   }
 
-  depends_on = [aws_instance.app_instance, aws_eip_association.eip_assoc, null_resource.setup_registry]
+  depends_on = [aws_instance.app_instance, aws_eip_association.eip_assoc, null_resource.setup_ssh]
 }
 
 
